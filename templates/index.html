@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이미지 색상 반전기</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        input, button { margin: 10px; padding: 10px; }
+        img { max-width: 200px; height: auto; margin: 10px; display: block; }
+        #previewContainer { display: flex; flex-wrap: wrap; justify-content: center; }
+    </style>
+</head>
+<body>
+    <h1>이미지 색상 반전기</h1>
+    <input type="file" id="imageInput" multiple accept="image/*">
+    <button onclick="uploadImages()">이미지 업로드</button>
+    <br>
+    <div id="previewContainer"></div>
+    <br>
+    <a id="downloadLink" style="display:none;" download="inverted_images.zip">변환된 이미지 ZIP 다운로드</a>
+
+    <script>
+        function uploadImages() {
+            let fileInput = document.getElementById("imageInput");
+            let files = fileInput.files;
+
+            if (files.length === 0) {
+                alert("이미지를 선택하세요!");
+                return;
+            }
+
+            let formData = new FormData();
+            for (let file of files) {
+                formData.append("files", file);
+            }
+
+            fetch("/upload", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                let url = URL.createObjectURL(blob);
+
+                // ZIP 파일 다운로드 링크 표시
+                let downloadLink = document.getElementById("downloadLink");
+                downloadLink.href = url;
+                downloadLink.style.display = "block";
+            })
+            .catch(error => console.error("에러 발생:", error));
+        }
+
+        // 이미지 미리보기 기능 추가
+        document.getElementById("imageInput").addEventListener("change", function(event) {
+            let files = event.target.files;
+            let previewContainer = document.getElementById("previewContainer");
+            previewContainer.innerHTML = "";
+
+            for (let file of files) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    let img = document.createElement("img");
+                    img.src = e.target.result;
+                    previewContainer.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>

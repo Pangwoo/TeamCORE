@@ -51,6 +51,16 @@ def upload():
             zipf.write(output_path, unique_filename)
 
     zip_buffer.seek(0)  # ZIP 파일 버퍼의 처음으로 이동
+    
+    try:
+        for folder in [UPLOAD_FOLDER, OUTPUT_FOLDER]:
+            for file_name in os.listdir(folder):
+                file_path = os.path.join(folder, file_name)
+                if os.path.isfile(file_path):  # 파일인지 확인 후 삭제
+                    os.remove(file_path)
+    except Exception as e:
+        print(f"파일 삭제 중 오류 발생: {e}")
+        
     return send_file(zip_buffer, mimetype="application/zip", as_attachment=True, download_name="inverted_images.zip")
 
 if __name__ == "__main__":

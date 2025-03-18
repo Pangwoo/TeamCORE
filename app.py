@@ -23,9 +23,11 @@ def upload():
     if not files or files[0].filename == "":
         return "파일을 선택하세요.", 400
 
+    idx = len(os.listdir(OUTPUT_FOLDER))
+
     zip_buffer = io.BytesIO()  # ZIP 파일을 저장할 메모리 버퍼
     with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
-        idx = 0
+        
         for file in files:
             filename = file.filename
             unique_filename = f"{idx}_{filename}"

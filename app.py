@@ -24,12 +24,12 @@ def upload():
         return "파일을 선택하세요.", 400
 
     zip_buffer = io.BytesIO()  # ZIP 파일을 저장할 메모리 버퍼
-    idx = 0
     with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
+        idx = 0
         for file in files:
             filename = file.filename
             unique_filename = f"{idx}_{filename}"
-            idx = idx + 1
+            idx += 1
             input_path = os.path.join(UPLOAD_FOLDER, unique_filename)
             output_path = os.path.join(OUTPUT_FOLDER, unique_filename)
             file.save(input_path)

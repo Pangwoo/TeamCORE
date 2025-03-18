@@ -3,6 +3,7 @@ from PIL import Image, ImageOps
 import os
 import zipfile
 import io
+import uuid
 
 app = Flask(__name__)
 
@@ -23,12 +24,14 @@ def upload():
         return "파일을 선택하세요.", 400
 
     zip_buffer = io.BytesIO()  # ZIP 파일을 저장할 메모리 버퍼
-
+    idx = 0
     with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
         for file in files:
             filename = file.filename
-            input_path = os.path.join(UPLOAD_FOLDER, filename)
-            output_path = os.path.join(OUTPUT_FOLDER, filename)
+            unique_filename = f"{idx}_{filename}"
+            idx = idx + 1
+            input_path = os.path.join(UPLOAD_FOLDER, unique_filename)
+            output_path = os.path.join(OUTPUT_FOLDER, unique_filename)
             file.save(input_path)
 
             # 이미지 불러오기 및 반전
@@ -43,7 +46,7 @@ def upload():
             inverted_image.save(output_path)
 
             # ZIP 파일에 추가
-            zipf.write(output_path, filename)
+            zipf.write(output_path, unique_filename)
 
     zip_buffer.seek(0)  # ZIP 파일 버퍼의 처음으로 이동
     return send_file(zip_buffer, mimetype="application/zip", as_attachment=True, download_name="inverted_images.zip")

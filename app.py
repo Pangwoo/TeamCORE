@@ -32,7 +32,7 @@ def upload():
             file.save(input_path)
 
             # 이미지 불러오기 및 반전
-            image = Image.open(input_path)
+            image = Image.open(input_path).convert("L")
             if image.mode == "RGBA":
                 r, g, b, a = image.split()
                 inverted_rgb = ImageOps.invert(Image.merge("RGB", (r, g, b)))
